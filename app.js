@@ -1,17 +1,29 @@
-// app.js — входной файл
-
+const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 
+const { PORT = 3000, BASE_PATH = 'mongodb://localhost:27017/mestodb' } = process.env;
 const app = express();
 
-// подключаемся к серверу mongo
-mongoose.connect('mongodb://localhost:27017/mestodb', {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+mongoose.connect('mongodb://localhost:27017/mestodb');
+
+app.use('/users', require('./routes/users'));
+
+app.use((req, res, next) => {
+  req.user = {
+    _id: '62d45a2a707c181fd52db70e' // вставьте сюда _id созданного в предыдущем пункте пользователя
+  };
+
+  next();
 });
 
-// подключаем мидлвары, роуты и всё остальное...
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.listen(3000);
+app.listen(PORT, () => {
+  console.log('Ссылка на сервер');
+  console.log(BASE_PATH);
+});
