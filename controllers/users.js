@@ -7,7 +7,7 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.find(req.params.id)
+  User.findById(req.user._id)
     .then((user) => res.send({ data: user }))
     .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
@@ -21,13 +21,13 @@ module.exports.createUser = (req, res) => {
 };
 
 module.exports.updateUserInfo = (req, res) => {
-  User.find(req.params.id, { name: req.body.name, about: req.body.about })
+  User.findByIdAndUpdate(req.user._id, { name: req.body.name, about: req.body.about })
     .then((user) => res.send({ data: user }))
     .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
 
 module.exports.updateUserAvatar = (req, res) => {
-  User.find(req.params.id, { avatar: req.body.avatar })
+  User.findByIdAndUpdate(req.user._id, { avatar: req.body.avatar })
     .then((user) => res.send({ data: user }))
     .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
