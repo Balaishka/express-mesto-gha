@@ -24,6 +24,10 @@ app.use('/cards', require('./routes/cards'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use((req, res) => {
+  res.status(404).send({ message: 'Такой страницы не существует' });
+});
+
 app.listen(PORT, () => {
   /* console.log('Ссылка на сервер');
   console.log(BASE_PATH); */
