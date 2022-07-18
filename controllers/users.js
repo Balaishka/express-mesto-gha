@@ -21,13 +21,14 @@ module.exports.createUser = (req, res) => {
 };
 
 module.exports.updateUserInfo = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, { name: req.body.name, about: req.body.about })
+  // eslint-disable-next-line max-len
+  User.findByIdAndUpdate(req.user._id, { name: req.body.name, about: req.body.about }, { new: true })
     .then((user) => res.send({ data: user }))
     .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
 
 module.exports.updateUserAvatar = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, { avatar: req.body.avatar })
+  User.findByIdAndUpdate(req.user._id, { avatar: req.body.avatar }, { new: true })
     .then((user) => res.send({ data: user }))
     .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
