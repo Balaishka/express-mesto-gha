@@ -7,8 +7,14 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.user._id)
-    .then((user) => res.send({ data: user }))
+  User.findById(req.params.userId)
+    .then((user) => {
+      if (user === null) {
+        res.status(400).send({ message: 'Некорректный id пользователя' });
+        return;
+      }
+      res.send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(404).send({ message: 'Пользователь не найден' });
@@ -44,7 +50,13 @@ module.exports.updateUserInfo = (req, res) => {
     { name: req.body.name, about: req.body.about },
     { new: true, runValidators: true },
   )
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (user === null) {
+        res.status(400).send({ message: 'Некорректный id пользователя' });
+        return;
+      }
+      res.send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Неверно введены имя или описание' });
@@ -66,7 +78,13 @@ module.exports.updateUserAvatar = (req, res) => {
     { avatar: req.body.avatar },
     { new: true, runValidators: true },
   )
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (user === null) {
+        res.status(400).send({ message: 'Некорректный id пользователя' });
+        return;
+      }
+      res.send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(404).send({ message: 'Пользователь не найден' });
