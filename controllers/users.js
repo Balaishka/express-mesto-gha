@@ -7,9 +7,9 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.params.id)
+  User.find(req.params.id)
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(404).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
 
 module.exports.createUser = (req, res) => {
@@ -21,17 +21,13 @@ module.exports.createUser = (req, res) => {
 };
 
 module.exports.updateUserInfo = (req, res) => {
-  const { newName, newAbout } = req.body;
-
-  User.findByIdAndUpdate(req.params.id, { name: newName, about: newAbout })
+  User.find(req.params.id, { name: req.body.name, about: req.body.about })
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
 
 module.exports.updateUserAvatar = (req, res) => {
-  const { newAvatar } = req.body;
-
-  User.findByIdAndUpdate(req.params.id, { avatar: newAvatar })
+  User.find(req.params.id, { avatar: req.body.avatar })
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
