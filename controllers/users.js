@@ -10,14 +10,14 @@ module.exports.getUser = (req, res) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (user === null) {
-        res.status(400).send({ message: 'Некорректный id пользователя' });
+        res.status(404).send({ message: 'Пользователь не найден' });
         return;
       }
       res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        res.status(400).send({ message: 'Некорректный id пользователя' });
         return;
       }
 
@@ -52,7 +52,7 @@ module.exports.updateUserInfo = (req, res) => {
   )
     .then((user) => {
       if (user === null) {
-        res.status(400).send({ message: 'Некорректный id пользователя' });
+        res.status(404).send({ message: 'Пользователь не найден' });
         return;
       }
       res.send({ data: user });
@@ -64,7 +64,7 @@ module.exports.updateUserInfo = (req, res) => {
       }
 
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        res.status(400).send({ message: 'Некорректный id пользователя' });
         return;
       }
 
@@ -80,14 +80,14 @@ module.exports.updateUserAvatar = (req, res) => {
   )
     .then((user) => {
       if (user === null) {
-        res.status(400).send({ message: 'Некорректный id пользователя' });
+        res.status(404).send({ message: 'Пользователь не найден' });
         return;
       }
       res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        res.status(400).send({ message: 'Некорректный id пользователя' });
         return;
       }
 
