@@ -7,9 +7,6 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.createCard = (req, res) => {
-  // eslint-disable-next-line no-underscore-dangle
-  // console.log(req.card._id);
-
   const { name, link } = req.body;
 
   Card.create({ name, link })
@@ -18,8 +15,19 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  // eslint-disable-next-line no-underscore-dangle
-  Card.findByIdAndRemove(req.params._id)
+  Card.findByIdAndRemove(req.params.cardId)
+    .then((card) => res.send({ data: card }))
+    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
+};
+
+module.exports.likeCard = (req, res) => {
+  Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+    .then((card) => res.send({ data: card }))
+    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
+};
+
+module.exports.dislikeCard = (req, res) => {
+  Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((card) => res.send({ data: card }))
     .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
