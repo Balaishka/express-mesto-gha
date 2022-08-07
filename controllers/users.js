@@ -1,24 +1,28 @@
 const validator = require('validator');
 const bcrypt = require('bcrypt');
-// const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const { jwtSign } = require('../helpers/jwt-sign');
-const { jwtVerify } = require('../helpers/jwt-verify');
+const jwtSign = require('../helpers/jwt-sign');
+const jwtVerify = require('../helpers/jwt-verify');
+const NotFoundError = require('../errors/not-found-err');
+const ValidationError = require('../errors/validation-err');
+// const CastError = require('../errors/cast-err');
+const ForbidddenError = require('../errors/forbiddden-err');
 
 const errorMessage = (res, status, textMessage) => {
   res.status(status).send({ message: textMessage });
 };
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   const isVerified = jwtVerify(req.headers.authorization);
 
-  if (isVerified) {
-    return User.find({})
-      .then((users) => res.send({ data: users }))
-      .catch(() => errorMessage(res, 400, 'Произошла ошибка'));
+  if (!isVerified) {
+    throw new ForbidddenError('Вы не авторизованы');
   }
 
-  return errorMessage(res, 403, 'Вы не авторизованы');
+  return User.find({})
+    .then((users) => res.send({ data: users }))
+    .catch(next);
+  // .catch(() => errorMessage(res, 400, 'Произошла ошибка'));
 };
 
 /* module.exports.getUser = (req, res) => {
@@ -40,23 +44,15 @@ module.exports.getUsers = (req, res) => {
     });
 }; */
 
-module.exports.getUserInfo = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (user === null) {
-        errorMessage(res, 404, 'Пользователь не найден');
-        return;
+        throw new NotFoundError('Пользователь не найден');
       }
       res.send({ data: user });
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        errorMessage(res, 400, 'Некорректный id пользователя');
-        return;
-      }
-
-      errorMessage(res, 500, 'Произошла ошибка');
-    });
+    .catch(next);
 };
 
 module.exports.createUser = (req, res) => {
@@ -65,8 +61,7 @@ module.exports.createUser = (req, res) => {
   } = req.body;
 
   if (!validator.isEmail(email)) {
-    errorMessage(res, 400, 'Некорректный email пользователя');
-    return;
+    throw new ValidationError('Некорректный email пользователя');
   }
 
   bcrypt.hash(password, 10)
@@ -142,7 +137,7 @@ module.exports.updateUserAvatar = (req, res) => {
     });
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -151,11 +146,5 @@ module.exports.login = (req, res) => {
       const token = jwtSign(user._id);
       return res.send({ token });// возвращаем токен
     })
-    .catch((err) => {
-      if (err.name === 'Error') {
-        errorMessage(res, 401, 'Неправильные почта или пароль');
-      }
-
-      errorMessage(res, 500, 'Произошла ошибка');
-    });
+    .catch(next);
 };

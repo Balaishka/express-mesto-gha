@@ -9,6 +9,4 @@ const jwtVerify = (token) => {
   }
 };
 
-module.exports = {
-  jwtVerify,
-};
+module.exports = jwtVerify;
