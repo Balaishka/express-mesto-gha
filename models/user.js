@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const CastError = require('../errors/cast-err');
+const UnauthorizedError = require('../errors/unauthorized-err');
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -38,14 +39,14 @@ userSchema.statics.findUserByCredentials = function findUserByCredentials(email,
     .then((user) => {
       if (!user) {
         // return Promise.reject(new Error('Неправильные почта или пароль'));
-        throw new CastError('Неправильные почта или пароль');
+        throw new UnauthorizedError('Неправильные почта или пароль');
       }
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
             // return Promise.reject(new Error('Неправильные почта или пароль'));
-            throw new CastError('Неправильные почта или пароль');
+            throw new UnauthorizedError('Неправильные почта или пароль');
           }
 
           return user; // теперь user доступен
