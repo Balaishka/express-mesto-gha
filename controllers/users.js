@@ -69,7 +69,16 @@ module.exports.createUser = (req, res) => {
       User.create({
         email, password: hash, name, about, avatar,
       })
-        .then((user) => res.send({ data: user }))
+        .then((user) => {
+          res.send({
+            data: {
+              email: user.email,
+              name: user.name,
+              about: user.about,
+              avatar: user.avatar,
+            },
+          });
+        })
         .catch((err) => {
           if (err.name === 'MongoServerError') {
             errorMessage(res, 409, 'Пользователь с таким email уже существует');
