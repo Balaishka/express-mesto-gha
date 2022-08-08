@@ -4,11 +4,53 @@ const User = require('../models/user');
 const jwtSign = require('../helpers/jwt-sign');
 const NotFoundError = require('../errors/not-found-err');
 const ValidationError = require('../errors/validation-err');
-// const CastError = require('../errors/cast-err');
-// const ForbidddenError = require('../errors/forbiddden-err');
+const EmailConflictError = require('../errors/email-conflict-err');
 
-const errorMessage = (res, status, textMessage) => {
-  res.status(status).send({ message: textMessage });
+module.exports.createUser = (req, res, next) => {
+  const {
+    email, password, name, about, avatar,
+  } = req.body;
+
+  if (!validator.isEmail(email)) {
+    throw new ValidationError('Некорректный email пользователя');
+  }
+
+  bcrypt.hash(password, 10)
+    .then((hash) => {
+      User.create({
+        email, password: hash, name, about, avatar,
+      })
+        .then((user) => {
+          res.send({
+            data: {
+              _id: user._id,
+              email: user.email,
+              name: user.name,
+              about: user.about,
+              avatar: user.avatar,
+            },
+          });
+        })
+        .catch((err) => {
+          if (err.code === 11000) {
+            next(new EmailConflictError('Пользователь с таким email уже существует'));
+          }
+
+          next(err);
+        });
+    });
+};
+
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      // создаем токен
+      const token = jwtSign(user._id);
+      return res.send({ token });// возвращаем токен
+    })
+    .catch(next);
 };
 
 module.exports.getUsers = (req, res, next) => {
@@ -39,47 +81,6 @@ module.exports.getUser = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
-  const {
-    email, password, name, about, avatar,
-  } = req.body;
-
-  if (!validator.isEmail(email)) {
-    throw new ValidationError('Некорректный email пользователя');
-  }
-
-  bcrypt.hash(password, 10)
-    .then((hash) => {
-      User.create({
-        email, password: hash, name, about, avatar,
-      })
-        .then((user) => {
-          res.send({
-            data: {
-              _id: user._id,
-              email: user.email,
-              name: user.name,
-              about: user.about,
-              avatar: user.avatar,
-            },
-          });
-        })
-        .catch((err) => {
-          if (err.name === 'MongoServerError') {
-            errorMessage(res, 409, 'Пользователь с таким email уже существует');
-            return;
-          }
-
-          if (err.name === 'ValidationError') {
-            errorMessage(res, 400, 'Неверно введены имя, описание или аватар');
-            return;
-          }
-
-          errorMessage(res, 500, 'Произошла ошибка');
-        });
-    });
-};
-
 module.exports.updateUserInfo = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
@@ -93,19 +94,6 @@ module.exports.updateUserInfo = (req, res, next) => {
       res.send({ data: user });
     })
     .catch(next);
-  /* .catch((err) => {
-      if (err.name === 'ValidationError') {
-        errorMessage(res, 400, 'Неверно введены имя или описание');
-        return;
-      }
-
-      if (err.name === 'CastError') {
-        errorMessage(res, 400, 'Некорректный id пользователя');
-        return;
-      }
-
-      errorMessage(res, 500, 'Произошла ошибка');
-    }); */
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {
@@ -119,26 +107,6 @@ module.exports.updateUserAvatar = (req, res, next) => {
         throw new NotFoundError('Пользователь не найден');
       }
       res.send({ data: user });
-    })
-    .catch(next);
-  /*  .catch((err) => {
-      if (err.name === 'CastError') {
-        errorMessage(res, 400, 'Некорректный id пользователя');
-        return;
-      }
-
-      errorMessage(res, 500, 'Произошла ошибка');
-    }); */
-};
-
-module.exports.login = (req, res, next) => {
-  const { email, password } = req.body;
-
-  return User.findUserByCredentials(email, password)
-    .then((user) => {
-      // создаем токен
-      const token = jwtSign(user._id);
-      return res.send({ token });// возвращаем токен
     })
     .catch(next);
 };
