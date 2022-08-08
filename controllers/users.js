@@ -26,22 +26,6 @@ module.exports.getUserById = (req, res, next) => {
       res.send({ data: user });
     })
     .catch(next);
-  /* User.findById(req.params.userId)
-    .then((user) => {
-      if (user === null) {
-        errorMessage(res, 404, 'Пользователь не найден');
-        return;
-      }
-      res.send({ data: user });
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        errorMessage(res, 400, 'Некорректный id пользователя');
-        return;
-      }
-
-      errorMessage(res, 500, 'Произошла ошибка');
-    }); */
 };
 
 module.exports.getUser = (req, res, next) => {
@@ -96,7 +80,7 @@ module.exports.createUser = (req, res) => {
     });
 };
 
-module.exports.updateUserInfo = (req, res) => {
+module.exports.updateUserInfo = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     { name: req.body.name, about: req.body.about },
@@ -104,12 +88,12 @@ module.exports.updateUserInfo = (req, res) => {
   )
     .then((user) => {
       if (user === null) {
-        errorMessage(res, 404, 'Пользователь не найден');
-        return;
+        throw new NotFoundError('Пользователь не найден');
       }
       res.send({ data: user });
     })
-    .catch((err) => {
+    .catch(next);
+  /* .catch((err) => {
       if (err.name === 'ValidationError') {
         errorMessage(res, 400, 'Неверно введены имя или описание');
         return;
@@ -121,10 +105,10 @@ module.exports.updateUserInfo = (req, res) => {
       }
 
       errorMessage(res, 500, 'Произошла ошибка');
-    });
+    }); */
 };
 
-module.exports.updateUserAvatar = (req, res) => {
+module.exports.updateUserAvatar = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     { avatar: req.body.avatar },
@@ -132,19 +116,19 @@ module.exports.updateUserAvatar = (req, res) => {
   )
     .then((user) => {
       if (user === null) {
-        errorMessage(res, 404, 'Пользователь не найден');
-        return;
+        throw new NotFoundError('Пользователь не найден');
       }
       res.send({ data: user });
     })
-    .catch((err) => {
+    .catch(next);
+  /*  .catch((err) => {
       if (err.name === 'CastError') {
         errorMessage(res, 400, 'Некорректный id пользователя');
         return;
       }
 
       errorMessage(res, 500, 'Произошла ошибка');
-    });
+    }); */
 };
 
 module.exports.login = (req, res, next) => {

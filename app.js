@@ -1,7 +1,6 @@
 // const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
-// const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
 const { celebrate, Joi } = require('celebrate');
@@ -44,10 +43,6 @@ app.post('/signup', celebrate({
 }), createUser);
 
 app.use(auth);
-
-/* app.get('/posts', (req, res) => {
-  console.log(req.cookies.jwt); // достаём токен
-}); */
 
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
