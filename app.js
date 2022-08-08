@@ -6,6 +6,7 @@ const { errors } = require('celebrate');
 const { celebrate, Joi } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const NotFoundError = require('./errors/not-found-err');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -23,7 +24,6 @@ app.post('/signin', celebrate({
 }), login);
 app.post('/signup', celebrate({
   body: Joi.object().keys({
-    _id: Joi.string(),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
@@ -39,8 +39,8 @@ app.use('/cards', require('./routes/cards'));
 
 // app.use(express.static(path.join(__dirname, 'public')));
 
-app.use((req, res) => {
-  res.status(404).send({ message: 'Такой страницы не существует' });
+app.use(() => {
+  throw new NotFoundError('Такой страницы не существует');
 });
 
 app.use(errors());
@@ -54,7 +54,7 @@ app.use((err, req, res, next) => {
     .send({
       // проверяем статус и выставляем сообщение в зависимости от него
       message: statusCode === 500
-        ? 'На сервере произошла ошибка и мы в обработчике ошибок'
+        ? 'На сервере произошла ошибка'
         : message,
     });
 

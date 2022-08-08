@@ -5,6 +5,7 @@ const jwtSign = require('../helpers/jwt-sign');
 const NotFoundError = require('../errors/not-found-err');
 const ValidationError = require('../errors/validation-err');
 const EmailConflictError = require('../errors/email-conflict-err');
+const CastError = require('../errors/cast-err');
 
 module.exports.createUser = (req, res, next) => {
   const {
@@ -32,11 +33,14 @@ module.exports.createUser = (req, res, next) => {
           });
         })
         .catch((err) => {
+          if (err.name === 'ValidationError') {
+            next(new ValidationError('Некорректно введены данные'));
+          }
           if (err.code === 11000) {
             next(new EmailConflictError('Пользователь с таким email уже существует'));
+          } else {
+            next(err);
           }
-
-          next(err);
         });
     });
 };
@@ -67,7 +71,13 @@ module.exports.getUserById = (req, res, next) => {
       }
       res.send({ data: user });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new CastError('Неверные данные'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.getUser = (req, res, next) => {
@@ -78,7 +88,13 @@ module.exports.getUser = (req, res, next) => {
       }
       res.send({ data: user });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new CastError('Неверные данные'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.updateUserInfo = (req, res, next) => {
@@ -93,7 +109,16 @@ module.exports.updateUserInfo = (req, res, next) => {
       }
       res.send({ data: user });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new ValidationError('Некорректно введены данные'));
+      }
+      if (err.name === 'CastError') {
+        next(new CastError('Неверные данные'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {
@@ -108,5 +133,14 @@ module.exports.updateUserAvatar = (req, res, next) => {
       }
       res.send({ data: user });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new ValidationError('Некорректно введены данные'));
+      }
+      if (err.name === 'CastError') {
+        next(new CastError('Неверные данные'));
+      } else {
+        next(err);
+      }
+    });
 };
