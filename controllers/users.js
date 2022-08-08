@@ -2,7 +2,6 @@ const validator = require('validator');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const jwtSign = require('../helpers/jwt-sign');
-// const jwtVerify = require('../helpers/jwt-verify');
 const NotFoundError = require('../errors/not-found-err');
 const ValidationError = require('../errors/validation-err');
 // const CastError = require('../errors/cast-err');
@@ -18,8 +17,16 @@ module.exports.getUsers = (req, res, next) => {
     .catch(next);
 };
 
-/* module.exports.getUser = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
+    .then((user) => {
+      if (user === null) {
+        throw new NotFoundError('Пользователь не найден');
+      }
+      res.send({ data: user });
+    })
+    .catch(next);
+ /*  User.findById(req.params.userId)
     .then((user) => {
       if (user === null) {
         errorMessage(res, 404, 'Пользователь не найден');
@@ -34,8 +41,8 @@ module.exports.getUsers = (req, res, next) => {
       }
 
       errorMessage(res, 500, 'Произошла ошибка');
-    });
-}; */
+    }); */
+};
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
