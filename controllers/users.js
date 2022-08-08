@@ -2,27 +2,20 @@ const validator = require('validator');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const jwtSign = require('../helpers/jwt-sign');
-const jwtVerify = require('../helpers/jwt-verify');
+// const jwtVerify = require('../helpers/jwt-verify');
 const NotFoundError = require('../errors/not-found-err');
 const ValidationError = require('../errors/validation-err');
 // const CastError = require('../errors/cast-err');
-const ForbidddenError = require('../errors/forbiddden-err');
+// const ForbidddenError = require('../errors/forbiddden-err');
 
 const errorMessage = (res, status, textMessage) => {
   res.status(status).send({ message: textMessage });
 };
 
 module.exports.getUsers = (req, res, next) => {
-  const isVerified = jwtVerify(req.headers.authorization);
-
-  if (!isVerified) {
-    throw new ForbidddenError('Вы не авторизованы');
-  }
-
-  return User.find({})
+  User.find({})
     .then((users) => res.send({ data: users }))
     .catch(next);
-  // .catch(() => errorMessage(res, 400, 'Произошла ошибка'));
 };
 
 /* module.exports.getUser = (req, res) => {
