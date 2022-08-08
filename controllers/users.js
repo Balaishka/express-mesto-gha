@@ -26,7 +26,7 @@ module.exports.getUserById = (req, res, next) => {
       res.send({ data: user });
     })
     .catch(next);
- /*  User.findById(req.params.userId)
+  /* User.findById(req.params.userId)
     .then((user) => {
       if (user === null) {
         errorMessage(res, 404, 'Пользователь не найден');
@@ -72,6 +72,7 @@ module.exports.createUser = (req, res) => {
         .then((user) => {
           res.send({
             data: {
+              _id: user._id,
               email: user.email,
               name: user.name,
               about: user.about,
