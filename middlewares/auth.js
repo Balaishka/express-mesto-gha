@@ -7,7 +7,7 @@ const auth = (req, res, next) => {
   if (!authorization || !authorization.startsWith('Bearer ')) {
     return res
       .status(401)
-      .send({ message: 'Необходима авторизация в первом if' });
+      .send({ message: 'Необходима авторизация' });
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -18,7 +18,7 @@ const auth = (req, res, next) => {
   } catch (err) {
     return res
       .status(401)
-      .send({ message: 'Необходима авторизация в catch' });
+      .send({ message: 'Необходима авторизация' });
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
