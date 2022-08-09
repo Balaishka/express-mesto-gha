@@ -35,12 +35,14 @@ module.exports.createUser = (req, res, next) => {
         .catch((err) => {
           if (err.name === 'ValidationError') {
             next(new ValidationError('Некорректно введены данные'));
+            return;
           }
           if (err.code === 11000) {
             next(new EmailConflictError('Пользователь с таким email уже существует'));
-          } else {
-            next(err);
+            return;
           }
+
+          next(err);
         });
     });
 };
@@ -74,9 +76,9 @@ module.exports.getUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new CastError('Неверные данные'));
-      } else {
-        next(err);
+        return;
       }
+      next(err);
     });
 };
 
@@ -91,9 +93,9 @@ module.exports.getUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new CastError('Неверные данные'));
-      } else {
-        next(err);
+        return;
       }
+      next(err);
     });
 };
 
@@ -112,12 +114,13 @@ module.exports.updateUserInfo = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Некорректно введены данные'));
+        return;
       }
       if (err.name === 'CastError') {
         next(new CastError('Неверные данные'));
-      } else {
-        next(err);
+        return;
       }
+      next(err);
     });
 };
 
@@ -136,11 +139,12 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Некорректно введены данные'));
+        return;
       }
       if (err.name === 'CastError') {
         next(new CastError('Неверные данные'));
-      } else {
-        next(err);
+        return;
       }
+      next(err);
     });
 };

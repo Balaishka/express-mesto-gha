@@ -1,12 +1,14 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const { isEmail, isURL } = require('validator');
 const UnauthorizedError = require('../errors/unauthorized-err');
 
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    match: /.+@.+\..+/,
+    // match: /.+@.+\..+/,
+    validate: isEmail,
     unique: true,
   },
   password: {
@@ -29,7 +31,8 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
-    match: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/,
+    // match: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/,
+    validate: isURL,
   },
 }, {
   versionKey: false,

@@ -16,12 +16,12 @@ const auth = (req, res, next) => {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     next(new UnauthorizedError('Необходима авторизация'));
+    return;
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
 
   next();
-  return '';
 };
 
 module.exports = auth;
